@@ -1,81 +1,89 @@
-bind_host: 0.0.0.0
-bind_port: 3000
-beta_bind_port: 0
+# 模板为大陆拦截国外
+# 账户root
+# 密码12345678
+# 网页端口8551
+# 监听端口8553
+
+http:
+  pprof:
+    port: 6060
+    enabled: false
+  address: 0.0.0.0:8551
+  session_ttl: 720h
 users:
-  - name: admin
-    password: $2y$10$vHRcARdPCieYG3RXWomV5evDYN.Nj/edtwEkQgQJZcK6z7qTLaIc6
+  - name: root
+    password: $2a$10$n/xuPRLW5DRy/vtlXkWnnOedMaVPnRdmvU/pyu1ZHdieWv8E8178m
 auth_attempts: 5
 block_auth_min: 15
 http_proxy: ""
-language: zh-cn
+language: ""
 theme: auto
-debug_pprof: false
 dns:
   bind_hosts:
     - 0.0.0.0
-  port: 1745
+  port: 8553
   anonymize_client_ip: false
-  protection_enabled: true
-  blocking_mode: default
-  blocking_ipv4: ""
-  blocking_ipv6: ""
-  blocked_response_ttl: 10
-  protection_disabled_until: null
-  parental_block_host: family-block.dns.adguard.com
-  safebrowsing_block_host: standard-block.dns.adguard.com
   ratelimit: 0
+  ratelimit_subnet_len_ipv4: 24
+  ratelimit_subnet_len_ipv6: 56
   ratelimit_whitelist: []
-  refuse_any: false
+  refuse_any: true
   upstream_dns:
-  - 223.5.5.5
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+    - https://dns.114dns.com/dns-query
+    - https://dns.cnnic.cn/dns-query
   upstream_dns_file: ""
   bootstrap_dns:
-  - 119.29.29.29
-  - 223.5.5.5
-  all_servers: false
-  fastest_addr: false
+    - 9.9.9.10
+    - 149.112.112.10
+    - 2620:fe::10
+    - 2620:fe::fe:10
+  fallback_dns: []
+  upstream_mode: parallel
   fastest_timeout: 1s
   allowed_clients: []
   disallowed_clients: []
   blocked_hosts:
-  - version.bind
-  - id.server
-  - hostname.bind
+    - version.bind
+    - id.server
+    - hostname.bind
   trusted_proxies:
-  - 127.0.0.0/8
-  - ::1/128
-  cache_size: 4194304
+    - 127.0.0.0/8
+    - ::1/128
+  cache_size: 41943040
   cache_ttl_min: 0
   cache_ttl_max: 0
-  cache_optimistic: true
+  cache_optimistic: false
   bogus_nxdomain: []
   aaaa_disabled: false
   enable_dnssec: false
-  edns_client_subnet: false
+  edns_client_subnet:
+    custom_ip: ""
+    enabled: false
+    use_custom: false
   max_goroutines: 300
+  handle_ddr: true
   ipset: []
-  filtering_enabled: true
-  filters_update_interval: 24
-  parental_enabled: false
-  safesearch_enabled: false
-  safebrowsing_enabled: false
-  safebrowsing_cache_size: 1048576
-  safesearch_cache_size: 1048576
-  parental_cache_size: 1048576
-  cache_time: 30
-  rewrites: []
-  blocked_services: []
+  ipset_file: ""
+  bootstrap_prefer_ipv6: false
   upstream_timeout: 10s
   private_networks: []
   use_private_ptr_resolvers: true
   local_ptr_upstreams: []
+  use_dns64: false
+  dns64_prefixes: []
+  serve_http3: false
+  use_http3_upstreams: false
+  serve_plain_dns: true
+  hostsfile_enabled: true
 tls:
   enabled: false
   server_name: ""
   force_https: false
   port_https: 443
   port_dns_over_tls: 853
-  port_dns_over_quic: 784
+  port_dns_over_quic: 853
   port_dnscrypt: 0
   dnscrypt_config_file: ""
   allow_unencrypted_doh: false
@@ -83,27 +91,80 @@ tls:
   private_key: ""
   certificate_path: ""
   private_key_path: ""
+  strict_sni_check: false
+querylog:
+  dir_path: ""
+  ignored: []
+  interval: 168h
+  size_memory: 1000
+  enabled: true
+  file_enabled: true
+statistics:
+  dir_path: ""
+  ignored: []
+  interval: 168h
+  enabled: true
 filters:
-- enabled: true
-  url: https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt
-  name: AdGuard DNS filter
-  id: 1628750870
-- enabled: true
-  url: https://anti-ad.net/easylist.txt
-  name: 'CHN: anti-AD'
-  id: 1628750871
-whitelist_filters: []
+  - enabled: true
+    url: https://raw.githubusercontent.com/BlueSkyXN/AdGuardHomeRules/master/all.txt
+    name: 百万ADH广告拦截过滤规则
+    id: 1737210486
+  - enabled: true
+    url: https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblockdns.txt
+    name: DNS 拦截
+    id: 1737210487
+  - enabled: true
+    url: https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/light.txt
+    name: 广告拦截
+    id: 1737210780
+  - enabled: true
+    url: https://raw.githubusercontent.com/Goooler/1024_hosts/master/hosts
+    name: 屏蔽一些1024站的弹窗广告和辣鸡澳门赌场的广告
+    id: 1737210782
+  - enabled: true
+    url: https://raw.githubusercontent.com/jdlingyu/ad-wars/master/hosts
+    name: 屏蔽一些中国视频网站的广告
+    id: 1737210783
+  - enabled: true
+    url: https://cdn.jsdelivr.net/gh/neoFelhz/neohosts@gh-pages/full/hosts.txt
+    name: 屏蔽 JS Miner 挖矿、百度全家桶的全天候定位记录、各类统计服务
+    id: 1737210784
+  - enabled: true
+    url: https://raw.githubusercontent.com/VeleSila/yhosts/master/hosts.txt
+    name: yhosts-屏蔽绝大多数中国网站以及APP的广告
+    id: 1737210785
+  - enabled: true
+    url: https://easylist-downloads.adblockplus.org/easylistchina.txt
+    name: EasyList China —— EasyList针对国内的补充规则
+    id: 1737210786
+  - enabled: true
+    url: https://easylist-downloads.adblockplus.org/easyprivacy.txt
+    name: EasyPrivacy —— 从网络上上完全删除所有形式的跟踪，包括Web错误
+    id: 1737210787
+  - enabled: true
+    url: https://raw.githubusercontent.com/privacy-protection-tools/anti-AD/master/anti-ad-easylist.txt
+    name: Anti-AD —— 目前中文区命中率最高的广告过滤列表，实现了精确的广告屏蔽和隐私保护
+    id: 1737210788
+  - enabled: true
+    url: https://raw.githubusercontent.com/BlueSkyXN/AdGuardHomeRules/master/skyrules.txt
+    name: 大圣净化 - 针对国内视频网站
+    id: 1737210791
+whitelist_filters:
+  - enabled: true
+    url: https://raw.githubusercontent.com/8680/GOODBYEADS/master/data/rules/allow.txt
+    name: 白名单1
+    id: 1737210792
+  - enabled: true
+    url: https://raw.githubusercontent.com/BlueSkyXN/AdGuardHomeRules/master/ok.txt
+    name: 白名单2
+    id: 1737214025
 user_rules:
-- '@@||taobao.com^$important'
-- '@@||jd.com^important'
-- '@@||flyme.cn^$important'
-- '@@||meizu.com^$important'
-- '@@||wl.jd.com^$important'
-- '@@||flydigi.com^'
-- '@@||pv.sohu.com^$important'
+  - '||blog.csdn.net^$important'
+  - '||www.csdn.net^$important'
 dhcp:
   enabled: false
   interface_name: ""
+  local_domain_name: lan
   dhcpv4:
     gateway_ip: ""
     subnet_mask: ""
@@ -117,12 +178,58 @@ dhcp:
     lease_duration: 86400
     ra_slaac_only: false
     ra_allow_slaac: false
-clients: []
-log_compress: false
-log_localtime: false
-log_max_backups: 0
-log_max_size: 100
-log_max_age: 3
-log_file: ""
-verbose: false
-schema_version: 10
+filtering:
+  blocking_ipv4: ""
+  blocking_ipv6: ""
+  blocked_services:
+    schedule:
+      time_zone: UTC
+    ids: []
+  protection_disabled_until: null
+  safe_search:
+    enabled: false
+    bing: true
+    duckduckgo: true
+    ecosia: true
+    google: true
+    pixabay: true
+    yandex: true
+    youtube: true
+  blocking_mode: default
+  parental_block_host: family-block.dns.adguard.com
+  safebrowsing_block_host: standard-block.dns.adguard.com
+  rewrites: []
+  safe_fs_patterns:
+    - /opt/adguardhome/work/userfilters/*
+  safebrowsing_cache_size: 1048576
+  safesearch_cache_size: 1048576
+  parental_cache_size: 1048576
+  cache_time: 30
+  filters_update_interval: 24
+  blocked_response_ttl: 10
+  filtering_enabled: true
+  parental_enabled: false
+  safebrowsing_enabled: false
+  protection_enabled: true
+clients:
+  runtime_sources:
+    whois: true
+    arp: true
+    rdns: true
+    dhcp: true
+    hosts: true
+  persistent: []
+log:
+  enabled: true
+  file: ""
+  max_backups: 0
+  max_size: 100
+  max_age: 3
+  compress: false
+  local_time: false
+  verbose: false
+os:
+  group: ""
+  user: ""
+  rlimit_nofile: 0
+schema_version: 29
