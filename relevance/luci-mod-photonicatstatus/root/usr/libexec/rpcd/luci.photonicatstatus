@@ -1,0 +1,47 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+
+case "$1" in
+    list)
+        printf '{ "getBatteryStatus": {} }'
+    ;;
+    call)
+        case "$2" in
+            getBatteryStatus)
+                json_init
+
+                eval $(/bin/ubus call system board 2>/dev/null | /usr/bin/jsonfilter -e 'MODEL=@.model')
+                json_add_object "$MODEL"
+
+                if [ -f /run/state/namespaces/Battery/ChargePercentage ] && \
+                   [ -f /run/state/namespaces/Battery/OnBattery ] && \
+                   [ -f /run/state/namespaces/Battery/Voltage ]; then
+                    json_add_boolean valid 1
+                    
+                    # 读取并格式化电量百分比（保留两位小数）
+                    percentage=$(awk '{printf "%.2f", $1}' /run/state/namespaces/Battery/ChargePercentage)
+                    json_add_string percentage "$percentage"
+
+                    # 读取充电状态
+                    on_battery=$(cat /run/state/namespaces/Battery/OnBattery)
+                    if [ "$on_battery" = "1" ]; then
+                        json_add_boolean charging 0
+                    else
+                        json_add_boolean charging 1
+                    fi
+
+                    # 读取电压并转换为毫伏
+                    voltage=$(awk '{printf "%.2f", $1/1000}' /run/state/namespaces/Battery/Voltage)
+                    json_add_string voltage "$voltage"
+                else
+                    json_add_boolean valid 0
+                    json_add_string message "Battery state files are missing"
+                fi
+
+                json_close_object
+                json_dump
+            ;;
+        esac
+    ;;
+esac

@@ -1,0 +1,42 @@
+.battery-icon {
+    display: inline-block;
+    position: relative;
+    width: 24px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.battery-icon::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    height: 6px;
+    background-color: currentColor;
+    border-radius: 0 2px 2px 0;
+}
+
+.battery-level {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background-color: currentColor;
+    transition: width 0.3s ease;
+}
+
+.battery-charging::before {
+    content: '⚡';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    z-index: 1;
+    color: #000;
+}
